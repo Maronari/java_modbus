@@ -16,7 +16,7 @@ import com.intelligt.modbus.jlibmodbus.tcp.TcpParameters;
 
 import jssc.SerialPortList;
 
-public class ModbusSurvey {
+public class ModbusSurveyTCP {
 
     public static int convertToSigned16Bit(int unsignedValue) {
         if ((unsignedValue & (1 << 15)) != 0) { // if the sign bit is set, the number is negative
