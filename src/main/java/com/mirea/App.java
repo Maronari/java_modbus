@@ -12,6 +12,10 @@ import com.intelligt.modbus.jlibmodbus.master.ModbusMaster;
 import com.intelligt.modbus.jlibmodbus.master.ModbusMasterFactory;
 import com.intelligt.modbus.jlibmodbus.tcp.TcpParameters;
 
+
+/****************************************************************
+ * get connection to remote server and read read all registers of slave 
+*****************************************************************/
 public class App {
 
     public static int convertToSigned16Bit(int unsignedValue) {
@@ -31,6 +35,7 @@ public class App {
             tcpParameters.setKeepAlive(true);
             tcpParameters.setPort(Modbus.TCP_PORT);
 
+            // create master
             ModbusMaster m = ModbusMasterFactory.createModbusMasterTCP(tcpParameters);
             Modbus.setAutoIncrementTransactionId(true);
 
@@ -44,12 +49,12 @@ public class App {
 
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
 
-                // at next string we receive ten registers from a slave with id of 1 at offset
-                // of 0.
                 while (true) {
 
                     int offset = 0;
+                    // receive registers from a slave with id of ID 1 at offset of 0
                     int[] registerValues = m.readInputRegisters(slaveId, offset, quantity);
+
                     Date date = new Date(System.currentTimeMillis());
                     System.out.println(formatter.format(date));
 

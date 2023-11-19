@@ -10,12 +10,11 @@ import com.intelligt.modbus.jlibmodbus.exception.ModbusNumberException;
 import com.intelligt.modbus.jlibmodbus.exception.ModbusProtocolException;
 import com.intelligt.modbus.jlibmodbus.master.ModbusMaster;
 import com.intelligt.modbus.jlibmodbus.master.ModbusMasterFactory;
-import com.intelligt.modbus.jlibmodbus.serial.SerialParameters;
-import com.intelligt.modbus.jlibmodbus.serial.SerialPort;
 import com.intelligt.modbus.jlibmodbus.tcp.TcpParameters;
 
-import jssc.SerialPortList;
-
+/****************************************************************
+ * get connection to remote server and read read registers of all slaves 
+*****************************************************************/
 public class ModbusSurveyTCP {
 
     public static int convertToSigned16Bit(int unsignedValue) {
@@ -28,21 +27,8 @@ public class ModbusSurveyTCP {
 
     public static void main(String[] args) {
         try {
-            String[] dev_list = SerialPortList.getPortNames();
-            //System.out.println("COM's: ");
-            for (String string : dev_list) {
-                System.out.print(string + " ");
-            }
 
             TcpParameters tcpParameters = new TcpParameters();
-            SerialParameters serialParameters = new SerialParameters();
-
-            // serial: COM1, 9600, 8
-            // serialParameters.setDevice("COM2");
-            serialParameters.setBaudRate(SerialPort.BaudRate.BAUD_RATE_9600);
-            serialParameters.setDataBits(8);
-            serialParameters.setParity(SerialPort.Parity.NONE);
-            serialParameters.setStopBits(1);
 
             // tcp: 127.0.0.1:502
             tcpParameters.setHost(InetAddress.getLocalHost());
@@ -52,10 +38,6 @@ public class ModbusSurveyTCP {
             ModbusMaster master = ModbusMasterFactory.createModbusMasterTCP(tcpParameters);
             Modbus.setAutoIncrementTransactionId(true);
             master.setResponseTimeout(100);
-
-            // ModbusMaster master =
-            // ModbusMasterFactory.createModbusMasterRTU(serialParameters);
-            // master.connect();
 
             int slaveId = 0;
             int quantity = 2;
@@ -75,8 +57,8 @@ public class ModbusSurveyTCP {
                             int offset = 0;
                             int[] registerValues = master.readInputRegisters(slaveId, offset, quantity);
                             for (int i = 1; i < registerValues.length; i += 2) {
-                                // int value = registerValues[i];
                                 System.out.println("Slave: " + slaveId);
+                                System.out.println("Register: " + i + " " + registerValues[i]);
                                 offset += 2;
                             }
                         } catch (ModbusIOException e) {

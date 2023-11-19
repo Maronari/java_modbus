@@ -13,6 +13,10 @@ import com.intelligt.modbus.jlibmodbus.serial.SerialPort;
 
 import jssc.SerialPortList;
 
+/****************************************************************
+ * get connection to serial port and read read all registers of slaves
+ * @NOTWORK
+*****************************************************************/
 public class ModbusSurveyRTU {
 
     public static void main(String[] args) {
@@ -27,7 +31,7 @@ public class ModbusSurveyRTU {
             }
             SerialParameters serialParameters = new SerialParameters();
 
-            // serial
+            // get serial connection parameters
             serialParameters.setDevice(dev_list[0]);
             serialParameters.setDataBits(8);
             serialParameters.setParity(SerialPort.Parity.NONE);
@@ -41,26 +45,28 @@ public class ModbusSurveyRTU {
             int quantity = 2;
 
             try {
-
                 while (true) {
                     System.out.println(formatter.format(date));
                     for (SerialPort.BaudRate rate : SerialPort.BaudRate.values()) {
-                        serialParameters.setBaudRate(rate);
+                        serialParameters.setBaudRate(rate);                                                 //change baud rate
                         System.out.println("BaudRate: " + serialParameters.getBaudRate());
 
-                        master = ModbusMasterFactory.createModbusMasterRTU(serialParameters);
+                        master = ModbusMasterFactory.createModbusMasterRTU(serialParameters);               //create master
                         master.setResponseTimeout(100);
                         master.connect();
 
-                        while (slaveId < 255) {
+                        while (slaveId < 255) {                                                             //iteration over all slaves
                             try {
                                 slaveId++;
                                 int offset = 0;
-                                int[] registerValues = master.readInputRegisters(slaveId, offset, quantity);
+                                int[] registerValues = master.readInputRegisters(slaveId, offset, quantity);//read register values of slave
+                                System.out.println("*********************************************************");
                                 for (int i = 1; i < registerValues.length; i += 2) {
                                     System.out.println("Slave: " + slaveId);
+                                    System.out.println("Register: " + i + " " + registerValues[i]);
                                     offset += 2;
                                 }
+                                System.out.println("*********************************************************");
                             } catch (ModbusIOException e) {
                                 continue;
                             }
