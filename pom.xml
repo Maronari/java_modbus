@@ -19,18 +19,57 @@
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>ias-snapshots</id>
+      <name>Infinite Automation Snapshot Repository</name>
+      <url>https://maven.mangoautomation.net/repository/ias-snapshot/</url>
+    </repository>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>ias-releases</id>
+      <name>Infinite Automation Release Repository</name>
+      <url>https://maven.mangoautomation.net/repository/ias-release/</url>
+    </repository>
+  </repositories>
+
   <dependencies>
+    <!--   Serial communication begin -->
+    <!--  https://mvnrepository.com/artifact/org.rxtx/rxtx  -->
     <dependency>
-      <groupId>com.intelligt.modbus</groupId>
-      <artifactId>jlibmodbus</artifactId>
-      <version>1.2.9.7</version>
+      <groupId>org.rxtx</groupId>
+      <artifactId>rxtx</artifactId>
+      <version>2.1.7</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.scream3r/jssc -->
+    <dependency>
+      <groupId>org.scream3r</groupId>
+      <artifactId>jssc</artifactId>
+      <version>2.8.0</version>
     </dependency>
 
     <dependency>
-      <groupId>io.github.java-native</groupId>
-      <artifactId>jssc</artifactId>
-      <version>2.9.5</version>
-  </dependency>
+      <groupId>com.infiniteautomation</groupId>
+      <artifactId>modbus4j</artifactId>
+      <version>3.0.3</version>
+    </dependency>
+    <!--   Serial communication end -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.7</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -47,6 +86,10 @@
         https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>
+          <configuration>
+            <source>6</source>
+            <target>6</target>
+          </configuration>
           <version>3.0.2</version>
         </plugin>
         <plugin>
