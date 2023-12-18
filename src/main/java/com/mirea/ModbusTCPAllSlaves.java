@@ -12,11 +12,10 @@ import com.intelligt.modbus.jlibmodbus.master.ModbusMaster;
 import com.intelligt.modbus.jlibmodbus.master.ModbusMasterFactory;
 import com.intelligt.modbus.jlibmodbus.tcp.TcpParameters;
 
-
 /****************************************************************
- * get connection to remote server and read read all registers of slave 
+ * get connection to remote server and read read registers of all slaves 
 *****************************************************************/
-public class App {
+public class ModbusTCPAllSlaves {
 
     public static int convertToSigned16Bit(int unsignedValue) {
         if ((unsignedValue & (1 << 15)) != 0) { // if the sign bit is set, the number is negative
@@ -28,6 +27,7 @@ public class App {
 
     public static void main(String[] args) {
         try {
+
             TcpParameters tcpParameters = new TcpParameters();
 
             // tcp: 127.0.0.1:502
@@ -35,38 +35,42 @@ public class App {
             tcpParameters.setKeepAlive(true);
             tcpParameters.setPort(Modbus.TCP_PORT);
 
-            // create master
-            ModbusMaster m = ModbusMasterFactory.createModbusMasterTCP(tcpParameters);
+            ModbusMaster master = ModbusMasterFactory.createModbusMasterTCP(tcpParameters);
             Modbus.setAutoIncrementTransactionId(true);
+            master.setResponseTimeout(100);
 
-            int slaveId = 1;
-            int quantity = 16;
-
+            int slaveId = 0;
+            int quantity = 2;
             try {
-                if (!m.isConnected()) {
-                    m.connect();
+                if (!master.isConnected()) {
+                    master.connect();
                 }
 
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
+                Date date = new Date(System.currentTimeMillis());
+                System.out.println(formatter.format(date));
 
                 while (true) {
-
-                    int offset = 0;
-                    // receive registers from a slave with id of ID 1 at offset of 0
-                    int[] registerValues = m.readInputRegisters(slaveId, offset, quantity);
-
-                    Date date = new Date(System.currentTimeMillis());
-                    System.out.println(formatter.format(date));
-
-                    for (int i = 1; i < registerValues.length; i += 2) {
-                        int value = registerValues[i];
-                        System.out.println("Address: " + offset + ", Value: " + (convertToSigned16Bit(value)));
-                        offset += 2;
+                    while (slaveId < 255) {
+                        try {
+                            slaveId++;
+                            int offset = 0;
+                            int[] registerValues = master.readInputRegisters(slaveId, offset, quantity);
+                            for (int i = 1; i < registerValues.length; i += 2) {
+                                System.out.println("Slave: " + slaveId);
+                                System.out.println("Register: " + i + " " + registerValues[i]);
+                                offset += 2;
+                            }
+                        } catch (ModbusIOException e) {
+                            continue;
+                        }
                     }
-
+                    slaveId = 0;
                     System.out.println("--------------------------------------------------------");
                     Thread.sleep(2000);
+
                 }
+
             } catch (ModbusProtocolException e) {
                 e.printStackTrace();
             } catch (ModbusNumberException e) {
@@ -75,7 +79,7 @@ public class App {
                 e.printStackTrace();
             } finally {
                 try {
-                    m.disconnect();
+                    master.disconnect();
                 } catch (ModbusIOException e) {
                     e.printStackTrace();
                 }

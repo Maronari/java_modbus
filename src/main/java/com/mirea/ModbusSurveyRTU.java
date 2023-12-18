@@ -14,7 +14,7 @@ import com.intelligt.modbus.jlibmodbus.serial.SerialPort;
 import jssc.SerialPortList;
 
 /****************************************************************
- * get connection to serial port and read read all registers of slaves
+ * get connection to serial port and read read all registers of slave
  * @NOTWORK
 *****************************************************************/
 public class ModbusSurveyRTU {
